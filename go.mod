@@ -1,6 +1,6 @@
 module arduino-text-control
 
-go 1.21.1
+go 1.23.0
 
 require (
 	github.com/creack/goselect v0.1.2 // indirect
