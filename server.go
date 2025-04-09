@@ -4,12 +4,22 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
+	"io/ioutil"
+	"encoding/json"
 	"go.bug.st/serial"
 	"go.bug.st/serial/enumerator"
 )
 
 var port serial.Port
+
+type WeatherResponse struct {
+	Main struct {
+		Temp float64 `json:"temp"`
+	} `json:"main"`
+	Weather []struct {
+		Description string `json:"description"`
+	} `json:"weather"`
+}
 
 func initSerial() serial.Port {
 	ports, err := enumerator.GetDetailedPortsList()
@@ -43,26 +53,77 @@ func initSerial() serial.Port {
 	return port
 }
 
+func getWeatherFromAPI() (string, error) {
+	apiUrl := "https://api.openweathermap.org/data/2.5/weather?q=Rochester&appid=8f2d56ab2a2d9d1f9572008afc5ff4dd&units=imperial"
+	resp, err := http.Get(apiUrl)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var weatherResponse WeatherResponse
+	err = json.Unmarshal(body, &weatherResponse)
+	if err != nil {
+		return "", err
+	}
+
+	if len(weatherResponse.Weather) == 0 {
+		return "No weather description available", nil
+	}
+
+	weatherText := fmt.Sprintf("%s, Temp: %.1f F", weatherResponse.Weather[0].Description, weatherResponse.Main.Temp)
+	return weatherText, nil
+}
+
+func FetchWeatherData() string {
+	weatherData, err := getWeatherFromAPI()
+	if err != nil {
+		log.Println("Error fetching weather data:", err)
+		return " "
+	}
+	return weatherData
+}
+
+func sendWeatherData(port serial.Port) {
+	weather := FetchWeatherData()  
+	message := weather + "\n"
+
+	_, err := port.Write([]byte(message))  
+	if err != nil {
+		log.Println("Failed to send weather data:", err)
+	}
+}
+
 func handleText(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		text := r.FormValue("text") + "\n"
-		_, err := port.Write([]byte(text))
+
+		sendWeatherData(port)
+
+		message := text
+		log.Println(text)
+		_, err := port.Write([]byte(message))
 		if err != nil {
-			http.Error(w, "Failed to send text", http.StatusInternalServerError)
+			http.Error(w, "Failed to send data to Arduino", http.StatusInternalServerError)
 			return
 		}
-		fmt.Println("Sent to Arduino:", text)
+
 		w.Write([]byte("OK"))
 	}
 }
 
 func main() {
 	port = initSerial()
-	defer port.Close()
 
-	http.Handle("/", http.FileServer(http.Dir("./static")))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/send", handleText)
+	http.Handle("/", http.FileServer(http.Dir("static")))
 
-	fmt.Println("Server started on http://localhost:8080")
+	fmt.Println("Server started at http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
