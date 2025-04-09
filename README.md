@@ -4,7 +4,7 @@
 
 **Hardware:** Arduino, TFT LCD.
 
-**Software:** Arduino IDE (with `MCUFRIEND_kbv`, `Adafruit_GFX`), Go (with `go.bug.st/serial`).
+**Software:** Arduino IDE (with `MCUFRIEND_kbv`, `Adafruit_GFX`), Go.
 
 
 **Usage:** Weather shows on top of LCD. Enter text on webpage and click "Send" to display it centered on the LCD.
