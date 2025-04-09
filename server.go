@@ -54,7 +54,7 @@ func initSerial() serial.Port {
 }
 
 func getWeatherFromAPI() (string, error) {
-	apiUrl := "https://api.openweathermap.org/data/2.5/weather?q=Rochester&appid=8f2d56ab2a2d9d1f9572008afc5ff4dd&units=imperial"
+	apiUrl := "https://api.openweathermap.org/data/2.5/weather?q=Rochester&appid=API_KEYdd&units=imperial"
 	resp, err := http.Get(apiUrl)
 	if err != nil {
 		return "", err
