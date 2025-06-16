@@ -9,4 +9,5 @@
 
 **Usage:** Weather shows on top of LCD. Enter text on webpage and click "Send" to display it centered on the LCD.
 
-![image](https://github.com/user-attachments/assets/56f3eacc-6f29-4425-b3d8-95967f83dbea)
+![image](https://github.com/user-attachments/assets/208e459a-93a0-451c-bed4-f9dd4ecb2036)
+
