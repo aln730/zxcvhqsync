@@ -124,6 +124,11 @@ func main() {
 	http.HandleFunc("/send", handleText)
 	http.Handle("/", http.FileServer(http.Dir("static")))
 
+<<<<<<< HEAD
 	fmt.Println("Server started at http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
+=======
+	fmt.Println("Server started on http://localhost:8080")
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
+>>>>>>> d696e55 (changes)
 }
