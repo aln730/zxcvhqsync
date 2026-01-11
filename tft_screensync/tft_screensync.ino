@@ -6,9 +6,6 @@ MCUFRIEND_kbv tft;
 #define SCREEN_WIDTH  480
 #define SCREEN_HEIGHT 320
 
-bool showAlert = true;
-unsigned long lastBlinkTime = 0;
-const unsigned long blinkInterval = 500; // Blink every 500ms
 
 void setup() {
     Serial.begin(9600);
@@ -33,27 +30,6 @@ void loop() {
         tft.fillRect(0, 40, SCREEN_WIDTH, SCREEN_HEIGHT - 40, 0x0000);
         displayText(inputText);
         displayText2("Room Occupant: Arnav Gawas (zxcv)");
-        displayText4("Network Goblin Inside!");
-    }
-
-    // Handle blinking !!Alert!!
-    unsigned long currentMillis = millis();
-    if (currentMillis - lastBlinkTime >= blinkInterval) {
-        lastBlinkTime = currentMillis;
-        showAlert = !showAlert;
-
-        // Clear alert area
-        int16_t x, y;
-        uint16_t w, h;
-        tft.setTextSize(2);
-        tft.getTextBounds("!!Alert!!", 0, 0, &x, &y, &w, &h);
-        int centerX = (SCREEN_WIDTH - w) / 2;
-        int centerY = (SCREEN_HEIGHT - h) / 2;
-        tft.fillRect(centerX, centerY, w, h, 0x0000);
-
-        if (showAlert) {
-            displayText3("!!Alert!!");
-        }
     }
 
     delay(100);
@@ -70,8 +46,16 @@ String fetchRealTimeWeather() {
 
 void displayWeather(String weather) {
     tft.setTextSize(2);
-    tft.setTextColor(0xFFFF); // White
-    tft.setCursor(10, 10);
+    tft.setTextColor(0xFFFF);
+
+    int16_t x1, y1;
+    uint16_t w, h;
+    tft.getTextBounds(weather, 0, 0, &x1, &y1, &w, &h);
+
+    int16_t x = (SCREEN_WIDTH - w) / 2;
+    int16_t y = 10;
+
+    tft.setCursor(x, y);
     tft.print(weather);
 }
 
@@ -84,7 +68,7 @@ void displayText(String text) {
 
     tft.getTextBounds(text, 0, 0, &x, &y, &w, &h);
     int centerX = (SCREEN_WIDTH - w) / 2;
-    int centerY = (SCREEN_HEIGHT - h - 150) / 2;
+    int centerY = (SCREEN_HEIGHT - h  ) / 2;
 
     tft.setCursor(centerX, centerY);
     tft.print(text);

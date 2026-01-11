@@ -1,11 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"io/ioutil"
-	"encoding/json"
+
 	"go.bug.st/serial"
 	"go.bug.st/serial/enumerator"
 )
@@ -73,7 +74,7 @@ func getWeatherFromAPI() (string, error) {
 	}
 
 	if len(weatherResponse.Weather) == 0 {
-		return "No weather description available", nil
+		return "Can I borrow your peephole?", nil
 	}
 
 	weatherText := fmt.Sprintf("%s, Temp: %.1f F", weatherResponse.Weather[0].Description, weatherResponse.Main.Temp)
@@ -90,10 +91,10 @@ func FetchWeatherData() string {
 }
 
 func sendWeatherData(port serial.Port) {
-	weather := FetchWeatherData()  
+	weather := FetchWeatherData()
 	message := weather + "\n"
 
-	_, err := port.Write([]byte(message))  
+	_, err := port.Write([]byte(message))
 	if err != nil {
 		log.Println("Failed to send weather data:", err)
 	}
@@ -124,11 +125,7 @@ func main() {
 	http.HandleFunc("/send", handleText)
 	http.Handle("/", http.FileServer(http.Dir("static")))
 
-<<<<<<< HEAD
 	fmt.Println("Server started at http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
-=======
-	fmt.Println("Server started on http://localhost:8080")
-	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
->>>>>>> d696e55 (changes)
+
 }
